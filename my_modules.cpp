@@ -42,19 +42,38 @@ int mpwd(char *argv[]){
 
 int mcd(char *argv[]) {
     int i = 0;
+
     while (argv[i][0] != '/0') {
         i++;
     }
-    if (i == 0)
+    if (i == 0){
+
         return 7;
+    }
     if (i > 2) {
+
         return 6;
     }
     if ((argv[0] == "-h" || argv[0] == "--help")||(i >1 &&( argv[1] == "-h" || argv[1] == "--help"))) {
         cout << "help: \n mcd <path> [-h|--help] \n Change current dir." << endl;
         //return 0;
     }
-    if (!(argv[0] == "-h" || argv[0] == "--help"))
-        return abs(chdir(argv[0]));
-    return i>1 && abs(chdir(argv[1]));
+    int k;
+    if (!(argv[0] == "-h" || argv[0] == "--help")){
+        k = abs(chdir(argv[0]));
+        //res.emplace_back(k);
+        if (k != 0) {
+
+            return 6;
+        }
+
+        return k;
+        }
+    k = i>1 && !abs(chdir(argv[1]));
+    if (k){
+
+        return 0;
+    }
+
+    return 6;
 }
