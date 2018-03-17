@@ -7,3 +7,5 @@
 
 #endif //MYSHELL_MY_MODULES_H
 #include <iostream>
+#include <unistd.h>
+int my_hello(char *argv[]);
