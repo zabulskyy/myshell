@@ -3,28 +3,33 @@
 #include <cstring>
 #include <vector>
 #include <wait.h>
+#include <algorithm>
 #include <dirent.h>
 
 using namespace std;
 
-int parse_command(string &cmd);
+void parse_command(string &cmd);
 
 void split_str(const string &txt, vector<string> &strs, char ch);
 
-void execute(const string &command, char *const *options);
+void execute(string &command, char *const *options);
 
-void my_exit(string error);
+void print_error(int error_code);
+
+void execute_my_command(string &command, char *const *options);
+
+string get_error_string(int error_code);
 
 char *prj_dir;  // myshell directory
 char mds_dir[1024];  // modules directory
+vector<string> my_modules;
 int merrno = 0;
-vector<string> errors;
 
 int main() {
-    errors = {" ", "getcwd() error", "\tError: "};
     string cmd;  // command
     char cur_dir[1024];  // current directory
     int parse_result = 0;  // just in case
+    my_modules = {"myhello", "merrno", "mpwd", "mcd", "mexit"};
 
     // get current directory
     if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
@@ -40,35 +45,31 @@ int main() {
     while (true) {
 
         if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
-            merrno = 1;
+            merrno = 4;
         }
         if (errno) {
             perror("\tError: ");
         }
         if (merrno) {
-            my_exit(errors[merrno]);
+            print_error(merrno);
         }
 
-
+        merrno = 0;
         cout << cur_dir << " $ ";
 
 
         if (getline(cin, cmd))
-            parse_result = parse_command(cmd);
-
-        if (parse_result != 0) {
-            /*TODO myexit*/
-        }
+            parse_command(cmd);
 
     }
     return 0;
 }
 
-int parse_command(string &cmd) {
+void parse_command(string &cmd) {
     if (cmd.empty() ||
         cmd.find_first_not_of(' ') == string::npos ||
         cmd.find_first_not_of('\t') == string::npos)
-        return 0;
+        return;
 
 
     vector<string> commands;
@@ -91,31 +92,50 @@ int parse_command(string &cmd) {
     pid_t pid = fork();
     int state = 0;
 
+
+    if (find(my_modules.begin(), my_modules.end(), command) != my_modules.end()) {
+        execute_my_command(command, options);
+        return;
+    }
+
+
     /*error*/
     if (pid == -1) {
-        /*TODO error*/
+        merrno = 3;
+        return;
     }
 
     /*child*/
     if (pid == 0) {
-        /*TODO try to search in modules */
-        if (command[0] == 'm') {
-            execute("modules/" + command, options);
-            exit(1);
-        }
+        execute(command, options);
+        return;
     }
 
-        /*parent*/
-    else {
-        waitpid(pid, &state, 0);
-    }
-
-    return 0;
+    /*parent*/
+    waitpid(pid, &state, 0);
 }
 
-void execute(const string &command, char *const *options) {
+void execute(string &command, char *const *options) {
 
-    execve(command.c_str(), options, environ);
+    DIR *adir;
+    struct dirent *ent;
+    if ((adir = opendir(prj_dir)) != nullptr) {
+        while ((ent = readdir(adir)) != nullptr) {
+            if (ent->d_name[0] == '.') continue;
+            if(ent->d_name == command){
+                execve((command).c_str(), options, environ);
+            };
+        }
+        closedir(adir);
+    } else {
+        /* could not open directory */
+        merrno = 2;
+    }
+}
+
+void execute_my_command(string &command, char *const *options) {
+    // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
+
 }
 
 void split_str(const string &txt, vector<string> &strs, char ch) {
@@ -136,22 +156,39 @@ void split_str(const string &txt, vector<string> &strs, char ch) {
 
 };
 
-void my_exit(string error) {
-    cout << error << endl;
+string get_error_string(int error_code) {
+    vector<string> errors;
+    errors = {"",
+              "permission denied",
+              "file/folder not found",
+              "no such process",
+              "getcwd() error",
+              "no such command",
+              "unknown error"};
+    return errors[error_code];
 
 }
 
+void print_error(int error_code) {
+    cout << "\tError: " << get_error_string(error_code) << endl;
+}
+
+
+
+
+/*
 void myls() {
     DIR *adir;
     struct dirent *ent;
     if ((adir = opendir("/home/zabulskyy/CLionProjects/myshell")) != NULL) {
-        /* print all the files and directories within directory */
+        //print all the files and directories within directory
         while ((ent = readdir(adir)) != NULL) {
             printf("%s\n", ent->d_name);
         }
         closedir(adir);
     } else {
-        /* could not open directory */
+        // could not open directory
         perror("");
     }
 }
+*/
