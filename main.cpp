@@ -14,6 +14,7 @@ void execute(const string &command, char *const *options);
 
 char *prj_dir;
 char mds_dir[1024];
+int merrno = 0;
 
 int main() {
 
@@ -124,3 +125,8 @@ void split_str(const string &txt, vector<string> &strs, char ch) {
     strs.push_back(txt.substr(initialPos, std::min(pos, txt.size()) - initialPos + 1));
 
 };
+
+void my_exit(string error){
+    cout << error<< endl;
+
+}
