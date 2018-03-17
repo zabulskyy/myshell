@@ -160,6 +160,7 @@ string get_error_string(int error_code) {
               "getcwd() error",
               "no such command",
               "wrong arguments",
+              "too few parameters",
               "unknown error"};
     return errors[error_code];
 

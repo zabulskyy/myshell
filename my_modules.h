@@ -9,3 +9,5 @@
 #include <iostream>
 #include <unistd.h>
 int my_hello(char *argv[]);
+int mpwd(char *argv[]);
+int mcd(char *argv[]);
