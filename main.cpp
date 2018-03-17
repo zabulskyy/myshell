@@ -21,13 +21,12 @@ void execute_my_command(string &command, char *const *options);
 string get_error_string(int error_code);
 
 char *prj_dir;  // myshell directory
-char mds_dir[1024];  // modules directory
+char cur_dir[1024];  // current directory
 vector<string> my_modules;
 int merrno = 0;
 
 int main() {
     string cmd;  // command
-    char cur_dir[1024];  // current directory
     int parse_result = 0;  // just in case
     my_modules = {"myhello", "merrno", "mpwd", "mcd", "mexit"};
 
@@ -38,10 +37,6 @@ int main() {
     }
 
     char *prj_dir = cur_dir;
-    char mds_dir[1024];
-    strcpy(mds_dir, cur_dir);
-    strcat(mds_dir, "/modules");
-
     while (true) {
 
         if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
@@ -55,7 +50,7 @@ int main() {
         }
 
         merrno = 0;
-        cout << cur_dir << " $ ";
+        cout << endl << cur_dir << " $ ";
 
 
         if (getline(cin, cmd))
@@ -122,7 +117,7 @@ void execute(string &command, char *const *options) {
     if ((adir = opendir(prj_dir)) != nullptr) {
         while ((ent = readdir(adir)) != nullptr) {
             if (ent->d_name[0] == '.') continue;
-            if(ent->d_name == command){
+            if (ent->d_name == command) {
                 execve((command).c_str(), options, environ);
             };
         }
@@ -164,6 +159,7 @@ string get_error_string(int error_code) {
               "no such process",
               "getcwd() error",
               "no such command",
+              "wrong arguments",
               "unknown error"};
     return errors[error_code];
 

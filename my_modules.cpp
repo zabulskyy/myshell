@@ -7,7 +7,7 @@ int my_hello(char *argv[]){
         i++;
     }
     if(i > 1){
-        return 5;
+        return 6;
     }
     if (i == 1 && (argv[0] == "-h" || argv[0] == "--help")){
         cout << "Print \"Hello World \"";
