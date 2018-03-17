@@ -32,11 +32,10 @@ int mpwd(char *argv[]){
     char dir[1024];
 
     if (getcwd(dir, sizeof(dir)) == nullptr) {
-        cerr << "getcwd() error" << endl;
-        exit(1);
+        return 4;
     }
 
     cout << dir << endl;
 
-    return 1;
+    return 0;
 }
