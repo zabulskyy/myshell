@@ -12,9 +12,12 @@ void split_str(const string &txt, vector<string> &strs, char ch);
 
 void execute(const string &command, char *const *options);
 
+void my_exit(string error);
+
 char *prj_dir;
 char mds_dir[1024];
 int merrno = 0;
+vector<string> errors = {" ", "getcwd() error", "\tError: "};
 
 int main() {
 
@@ -23,8 +26,8 @@ int main() {
     int parse_result = 0;
 
     if (getcwd(dir, sizeof(dir)) == nullptr) {
-        cerr << "getcwd() error" << endl;
-        exit(1);
+        merrno = 1 ;
+        my_exit(errors[merrno]);
     }
 
     char *prj_dir = dir;
@@ -33,15 +36,17 @@ int main() {
     strcat(mds_dir, "/modules");
 
     while (true) {
-        if (errno) {
-            perror("\tError: ");
-            return 1;
-        }
+
         if (getcwd(dir, sizeof(dir)) == nullptr) {
-            cerr << "getcwd() error" << endl;
-            return 1;
+
+            merrno = 1;
         }
 
+        if (merrno) {
+
+            my_exit(errors[merrno]);
+
+        }
         cout << dir << " $ ";
 
         if (getline(cin, cmd))
