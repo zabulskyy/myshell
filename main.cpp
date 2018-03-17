@@ -3,6 +3,7 @@
 #include <cstring>
 #include <vector>
 #include <wait.h>
+#include <dirent.h>
 
 using namespace std;
 
@@ -14,47 +15,50 @@ void execute(const string &command, char *const *options);
 
 void my_exit(string error);
 
-char *prj_dir;
-char mds_dir[1024];
+char *prj_dir;  // myshell directory
+char mds_dir[1024];  // modules directory
 int merrno = 0;
-vector<string> errors = {" ", "getcwd() error", "\tError: "};
+vector<string> errors;
 
 int main() {
+    errors = {" ", "getcwd() error", "\tError: "};
+    string cmd;  // command
+    char cur_dir[1024];  // current directory
+    int parse_result = 0;  // just in case
 
-    string cmd;
-    char dir[1024];
-    int parse_result = 0;
-
-    if (getcwd(dir, sizeof(dir)) == nullptr) {
-        merrno = 1 ;
-        my_exit(errors[merrno]);
+    // get current directory
+    if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
+        cerr << "getcwd() error" << endl;
+        /*TODO myexit*/
     }
 
-    char *prj_dir = dir;
+    char *prj_dir = cur_dir;
     char mds_dir[1024];
-    strcpy(mds_dir, dir);
+    strcpy(mds_dir, cur_dir);
     strcat(mds_dir, "/modules");
 
     while (true) {
 
-        if (getcwd(dir, sizeof(dir)) == nullptr) {
-
+        if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
             merrno = 1;
         }
-
-        if (merrno) {
-
-            my_exit(errors[merrno]);
-
+        if (errno) {
+            perror("\tError: ");
         }
-        cout << dir << " $ ";
+        if (merrno) {
+            my_exit(errors[merrno]);
+        }
+
+
+        cout << cur_dir << " $ ";
+
 
         if (getline(cin, cmd))
             parse_result = parse_command(cmd);
 
-        if (parse_result != 0)
-            return parse_result;
-
+        if (parse_result != 0) {
+            /*TODO myexit*/
+        }
 
     }
     return 0;
@@ -110,6 +114,7 @@ int parse_command(string &cmd) {
 }
 
 void execute(const string &command, char *const *options) {
+
     execve(command.c_str(), options, environ);
 }
 
@@ -131,7 +136,22 @@ void split_str(const string &txt, vector<string> &strs, char ch) {
 
 };
 
-void my_exit(string error){
-    cout << error<< endl;
+void my_exit(string error) {
+    cout << error << endl;
 
+}
+
+void myls() {
+    DIR *adir;
+    struct dirent *ent;
+    if ((adir = opendir("/home/zabulskyy/CLionProjects/myshell")) != NULL) {
+        /* print all the files and directories within directory */
+        while ((ent = readdir(adir)) != NULL) {
+            printf("%s\n", ent->d_name);
+        }
+        closedir(adir);
+    } else {
+        /* could not open directory */
+        perror("");
+    }
 }
