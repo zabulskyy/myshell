@@ -10,10 +10,13 @@ int parse_command(string &cmd);
 
 void split_str(const string &txt, vector<string> &strs, char ch);
 
+void execute(const string &command, char *const *options);
+
 char *prj_dir;
 char mds_dir[1024];
 
 int main() {
+
     string cmd;
     char dir[1024];
     int parse_result = 0;
@@ -85,9 +88,9 @@ int parse_command(string &cmd) {
 
     /*child*/
     if (pid == 0) {
-        /*TODO try to search in modules*/
+        /*TODO try to search in modules */
         if (command[0] == 'm') {
-            execve(("modules/" + command).c_str(), options, environ);
+            execute("modules/" + command, options);
             exit(1);
         }
     }
@@ -98,6 +101,10 @@ int parse_command(string &cmd) {
     }
 
     return 0;
+}
+
+void execute(const string &command, char *const *options) {
+    execve(command.c_str(), options, environ);
 }
 
 void split_str(const string &txt, vector<string> &strs, char ch) {
