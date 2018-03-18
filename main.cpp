@@ -33,8 +33,10 @@ int main() {
     // get current directory
     if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
         cerr << "getcwd() error" << endl;
-        /*TODO myexit*/
+        merrno = 4;
     }
+    if (merrno)
+        print_error(merrno);
 
     char *prj_dir = cur_dir;
     while (true) {

@@ -77,3 +77,35 @@ int mcd(char *argv[]) {
 
     return 6;
 }
+
+int mexit(char *argv[]){
+    int i = 0;
+    // arg code of error if need to exit positive else negative, if err code 0 and don't need to exit then -1024
+    int result = -1024;
+
+    while (argv[i][0] != '/0') {
+        i++;
+    }
+    if (i == 0){
+
+        result=0;
+        return result;
+    }
+    if (i > 2) {
+        result = -6;
+        return result;
+    }
+    if ((argv[0] == "-h" || argv[0] == "--help")||(i >1 &&( argv[1] == "-h" || argv[1] == "--help"))) {
+        cout << "help: \n mexit <code of end> [-h|--help] \n Exit from myshell." << endl;
+        result = -1024;
+        return result;
+    }
+
+    if (atoi(argv[0]) > -1){
+        result = atoi(argv[0]);
+        return result;
+    }
+    result = -6;
+    return result;
+
+}
