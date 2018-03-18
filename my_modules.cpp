@@ -52,7 +52,7 @@ int mcd(vector<string> argv) {
     int k = 0;
     for (int i = 0; i < n; i++) {
         if(!argv[i].empty() && !isspace(argv[i][0])){
-            k = chdir((const char *) argv[i]);
+            k = chdir( argv[i].c_str());
 
             if (k != 0) {
                 return 6;
@@ -82,8 +82,8 @@ int mexit(vector<string> argv){
     }
 
     for (int i = 0; i < n; i++) {
-        if(!argv[i].empty() && !isspace(argv[i][0]) && atoi((const char *) argv[i]) > -1){
-            result = atoi((const char *) argv[i]);
+        if(!argv[i].empty() && !isspace(argv[i][0]) && atoi(argv[i].c_str()) > -1){
+            result = atoi(argv[i].c_str());
             return result;
         }
     }

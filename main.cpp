@@ -5,7 +5,7 @@
 #include <wait.h>
 #include <algorithm>
 #include <dirent.h>
-#include <my_modules.h>
+//#include <my_modules.h>
 #include "my_modules.h"
 
 using namespace std;
@@ -137,7 +137,7 @@ void execute_my_command(string &command, vector<string> options) {
     // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
 
     for(int i = 0; i < my_modules.size(); i++){
-        if(strcmp(reinterpret_cast<const char *>(command[0]), (const char *) my_modules[i]) == 0){
+        if(command == my_modules[i]){
             if(i == 0){
                 merrno = myhello(options);
             } else if(i == 1){
