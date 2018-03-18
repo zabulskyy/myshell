@@ -1,7 +1,7 @@
 #include "my_modules.h"
 
 using namespace std;
-int my_hello(char *argv[]){
+int my_hello(char  *argv[]){
     int i = 0;
     while(argv[i][0] != '/0'){
         i++;

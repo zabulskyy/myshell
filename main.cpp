@@ -5,6 +5,8 @@
 #include <wait.h>
 #include <algorithm>
 #include <dirent.h>
+#include <my_modules.h>
+#include "my_modules.h"
 
 using namespace std;
 
@@ -132,6 +134,10 @@ void execute(string &command, char *const *options) {
 
 void execute_my_command(string &command, char *const *options) {
     // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
+
+    if(strcmp(reinterpret_cast<const char *>(command[0]), "myhello") == 0){
+        //my_hello(options);
+    }
 
 }
 
