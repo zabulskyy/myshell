@@ -65,28 +65,28 @@ int mcd(vector<string> argv) {
 }
 
 int mexit(vector<string> argv){
-    long i = argv.size();
+    long n = argv.size();
 
     // arg code of error if need to exit positive else negative, if err code 0 and don't need to exit then -1024
     int result = -1024;
 
 
-    if (i == 0){
-
-        result=0;
-        return result;
+    for (int i = 0; i < n; i++) {
+        if ((argv[i] == "-h" || argv[i] == "--help")) {
+            cout << "help: \n mexit <code of end> [-h|--help] \n Exit from myshell." << endl;
+            result = -1024;
+            return result;
+        }
     }
 
-    if ((argv[0] == "-h" || argv[0] == "--help")||(i >1 &&( argv[1] == "-h" || argv[1] == "--help"))) {
-        cout << "help: \n mexit <code of end> [-h|--help] \n Exit from myshell." << endl;
-        result = -1024;
-        return result;
+    for (int i = 0; i < n; i++) {
+        if(!argv[i].empty() && !isspace(argv[i][0]) && atoi((const char *) argv[i]) > -1){
+            result = atoi((const char *) argv[i]);
+            return result;
+        }
     }
 
-//    if (atoi(argv[0]) > -1){
-//        result = atoi(argv[0]);
-//        return result;
-//    }
+
     result = -6;
     return result;
 
