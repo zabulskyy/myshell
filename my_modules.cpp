@@ -1,13 +1,15 @@
 #include "my_modules.h"
 
 using namespace std;
-int my_hello(vector<string> argv){
+int myhello(vector<string> argv){
     long n = argv.size();
-    for(int i = 0; i<n; i++)
-        if (argv[i] == "-h" || argv[i] == "--help"){
-            cout << "help: \n my_hello [-h|--help] \n Print \"Hello World \""<< endl;
+    for(int i = 0; i<n; i++) {
+        if (argv[i] == "-h" || argv[i] == "--help") {
+            cout << "help: \n my_hello [-h|--help] \n Print \"Hello World \"" << endl;
             return 0;
-        }
+        } else if (!argv[i].empty() && !isspace(argv[i][0]))
+            return 6;
+    }
     cout << "Hello, World!\n";
     return 0;
 }
@@ -89,5 +91,19 @@ int mexit(vector<string> argv){
 
     result = -6;
     return result;
+
+}
+
+int merrno_f(vector<string> argv) {
+    long n = argv.size();
+
+    for (int i = 0; i < n; i++) {
+        if ((argv[i] == "-h" || argv[i] == "--help")) {
+            cout << "help: \n merrno [-h|--help] \n Code of last error." << endl;
+            return 0;
+        }
+        else if (!argv[i].empty() && !isspace(argv[i][0]))
+            return 6;
+    }
 
 }

@@ -8,7 +8,8 @@
 #include <vector>
 #include <string>
 using namespace std;
-int my_hello(vector<string> argv);
+int myhello(vector<string> argv);
 int mpwd(vector<string> argv);
 int mcd(vector<string> argv);
 int mexit(vector<string> argv);
+int merrno_f(vector<string> argv) ;

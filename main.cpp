@@ -22,15 +22,16 @@ void execute_my_command(string &command, vector<string> options);
 
 string get_error_string(int error_code);
 
+void merrno_(vector<string> argv);
+
 char *prj_dir;  // myshell directory
 char cur_dir[1024];  // current directory
-vector<string> my_modules;
+vector<string> my_modules = {"myhello", "merrno", "mpwd", "mcd", "mexit"};
 int merrno = 0;
 
 int main() {
     string cmd;  // command
     int parse_result = 0;  // just in case
-    my_modules = {"myhello", "merrno", "mpwd", "mcd", "mexit"};
 
     // get current directory
     if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
@@ -135,9 +136,31 @@ void execute(string &command, char *const *options) {
 void execute_my_command(string &command, vector<string> options) {
     // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
 
-    if(strcmp(reinterpret_cast<const char *>(command[0]), "myhello") == 0){
-        //my_hello(options);
+    for(int i = 0; i < my_modules.size(); i++){
+        if(strcmp(reinterpret_cast<const char *>(command[0]), (const char *) my_modules[i]) == 0){
+            if(i == 0){
+                merrno = myhello(options);
+            } else if(i == 1){
+                merrno_(options);
+            } else if (i ==2){
+                merrno = mpwd(options);
+            } else if (i == 3){
+                merrno = mcd(options);
+            } else if (i == 4){
+                int k = mexit(options);
+
+                if (k != -1024){
+                    merrno = abs(k);
+                } else merrno = 0;
+                if( k > -1){
+                    exit(merrno);
+                }
+            }
+
+        }
     }
+
+
 
 }
 
@@ -178,6 +201,10 @@ void print_error(int error_code) {
     cout << "\tError: " << get_error_string(error_code) << endl;
 }
 
+void merrno_(vector<string> argv){
+    merrno = merrno_f(argv);
+    print_error(merrno);
+}
 
 
 
