@@ -18,7 +18,7 @@ void execute(string &command, char *const *options);
 
 void print_error(int error_code);
 
-void execute_my_command(string &command, char *const *options);
+void execute_my_command(string &command, vector<string> options);
 
 string get_error_string(int error_code);
 
@@ -93,7 +93,7 @@ void parse_command(string &cmd) {
 
 
     if (find(my_modules.begin(), my_modules.end(), command) != my_modules.end()) {
-        execute_my_command(command, options);
+        execute_my_command(command, commands);
         return;
     }
 
@@ -132,7 +132,7 @@ void execute(string &command, char *const *options) {
     }
 }
 
-void execute_my_command(string &command, char *const *options) {
+void execute_my_command(string &command, vector<string> options) {
     // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
 
     if(strcmp(reinterpret_cast<const char *>(command[0]), "myhello") == 0){
