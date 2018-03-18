@@ -9,6 +9,6 @@
 #include <string>
 using namespace std;
 int my_hello(vector<string> argv);
-int mpwd(char *argv[]);
-int mcd(char *argv[]);
-int mexit(char *argv[]);
+int mpwd(vector<string> argv);
+int mcd(vector<string> argv);
+int mexit(vector<string> argv);

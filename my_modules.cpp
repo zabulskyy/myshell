@@ -14,12 +14,16 @@ int my_hello(vector<string> argv){
 
 int mpwd(vector<string> argv){
     long n = argv.size();
-    for(int i = 0; i<n; i++)
-        if (argv[i] == "-h" || argv[i] == "--help"){
+    char dir[1024];
+    for(int i = 0; i<n; i++) {
+        if (argv[i] == "-h" || argv[i] == "--help") {
             cout << "help: \n mpwd [-h|--help] \n Write current dir." << endl;
             return 0;
+
         }
-    char dir[1024];
+
+    }
+
 
     if (getcwd(dir, sizeof(dir)) == nullptr) {
         return 4;
@@ -30,34 +34,32 @@ int mpwd(vector<string> argv){
     return 0;
 }
 
-int mcd(vector<string> argv){
-    long i = argv.size();
+int mcd(vector<string> argv) {
+    long n = argv.size();
 
-    if (i == 0){
+    if (n == 0) {
 
         return 7;
     }
-
-    if ((argv[0] == "-h" || argv[0] == "--help")||(i >1 &&( argv[1] == "-h" || argv[1] == "--help"))) {
-        cout << "help: \n mcd <path> [-h|--help] \n Change current dir." << endl;
-        //return 0;
+    for (int i = 0; i < n; i++) {
+        if ((argv[i] == "-h" || argv[i] == "--help")) {
+            cout << "help: \n mcd <path> [-h|--help] \n Change current dir." << endl;
+            return 0;
+        }
     }
     int k = 0;
-    if (!(argv[0] == "-h" || argv[0] == "--help")){
-        //k = abs(chdir(argv[0]));
-        //res.emplace_back(k);
-        if (k != 0) {
+    for (int i = 0; i < n; i++) {
+        if(!argv[i].empty() && !isspace(argv[i][0])){
+            k = chdir((const char *) argv[i]);
 
-            return 6;
+            if (k != 0) {
+                return 6;
+            }
+
+            return k;
         }
-
-        return k;
-        }
-    //k = i>1 && !abs(chdir(argv[1]));
-    if (k){
-
-        return 0;
     }
+
 
     return 6;
 }
