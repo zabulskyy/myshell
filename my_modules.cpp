@@ -3,12 +3,16 @@
 using namespace std;
 int myhello(vector<string> argv){
     long n = argv.size();
+    int vova = 0;
     for(int i = 0; i<n; i++) {
         if (argv[i] == "-h" || argv[i] == "--help") {
             cout << "help: \n my_hello [-h|--help] \n Print \"Hello World \"" << endl;
             return 0;
         } else if (!argv[i].empty() && !isspace(argv[i][0]))
-            return 6;
+            if (vova)
+                return 6;
+            else
+                vova++;
     }
     cout << "Hello, World!\n";
     return 0;
@@ -17,12 +21,17 @@ int myhello(vector<string> argv){
 int mpwd(vector<string> argv){
     long n = argv.size();
     char dir[1024];
+    int vova =0 ;
     for(int i = 0; i<n; i++) {
         if (argv[i] == "-h" || argv[i] == "--help") {
             cout << "help: \n mpwd [-h|--help] \n Write current dir." << endl;
             return 0;
 
-        }
+        }else if (!argv[i].empty() && !isspace(argv[i][0]))
+            if (vova)
+                return 6;
+            else
+                vova++;
 
     }
 
@@ -50,15 +59,29 @@ int mcd(vector<string> argv) {
         }
     }
     int k = 0;
+    int vova = 0;
     for (int i = 0; i < n; i++) {
         if(!argv[i].empty() && !isspace(argv[i][0])){
-            k = chdir( argv[i].c_str());
 
-            if (k != 0) {
-                return 6;
+            if (vova){
+                //cout << argv[i] << endl;
+                if (argv[i] == "."){
+                    return 0;
+                }
+
+                k = chdir( argv[i].c_str());
+
+                if (k != 0) {
+                    return 6;
+                }
+
+                return k;
             }
 
-            return k;
+            else
+                vova++;
+
+
         }
     }
 
@@ -71,7 +94,7 @@ int mexit(vector<string> argv){
 
     // arg code of error if need to exit positive else negative, if err code 0 and don't need to exit then -1024
     int result = -1024;
-
+    int vova = 0;
 
     for (int i = 0; i < n; i++) {
         if ((argv[i] == "-h" || argv[i] == "--help")) {
@@ -83,8 +106,13 @@ int mexit(vector<string> argv){
 
     for (int i = 0; i < n; i++) {
         if(!argv[i].empty() && !isspace(argv[i][0]) && atoi(argv[i].c_str()) > -1){
-            result = atoi(argv[i].c_str());
-            return result;
+            if (vova){
+                result = atoi(argv[i].c_str());
+                return result;
+            }
+            else
+                vova++;
+
         }
     }
 
@@ -96,14 +124,17 @@ int mexit(vector<string> argv){
 
 int merrno_f(vector<string> argv) {
     long n = argv.size();
-
+    int vova = 0;
     for (int i = 0; i < n; i++) {
         if ((argv[i] == "-h" || argv[i] == "--help")) {
             cout << "help: \n merrno [-h|--help] \n Code of last error." << endl;
             return 0;
         }
         else if (!argv[i].empty() && !isspace(argv[i][0]))
-            return 6;
+            if (vova)
+                return 6;
+            else
+                vova++;
     }
 
 }
