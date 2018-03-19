@@ -14,8 +14,13 @@ int myhello(vector<string> argv){
             else
                 vova++;
     }
-    cout << "Hello, World!\n";
+    cout << "Hello, World! \n";
     return 0;
+//
+//    Hello, World!
+//
+//                /home/iryna/CLionProjects/myshell $ Hello, World!
+
 }
 
 int mpwd(vector<string> argv){
@@ -43,6 +48,10 @@ int mpwd(vector<string> argv){
     cout << dir << endl;
 
     return 0;
+//    /home/iryna/CLionProjects/myshell/cmake-build-debug
+//
+//                                                  /home/iryna/CLionProjects/myshell/cmake-build-debug $ /home/iryna/CLionProjects/myshell/cmake-build-debug
+
 }
 
 int mcd(vector<string> argv) {
@@ -93,22 +102,25 @@ int mexit(vector<string> argv){
     long n = argv.size();
 
     // arg code of error if need to exit positive else negative, if err code 0 and don't need to exit then -1024
-    int result = -1024;
+    long result = -1024;
     int vova = 0;
 
     for (int i = 0; i < n; i++) {
         if ((argv[i] == "-h" || argv[i] == "--help")) {
             cout << "help: \n mexit <code of end> [-h|--help] \n Exit from myshell." << endl;
             result = -1024;
-            return result;
+            return static_cast<int>(result);
         }
     }
 
     for (int i = 0; i < n; i++) {
-        if(!argv[i].empty() && !isspace(argv[i][0]) && atoi(argv[i].c_str()) > -1){
+        char * pEnd;
+        if(!argv[i].empty() && !isspace(argv[i][0]) ){
             if (vova){
-                result = atoi(argv[i].c_str());
-                return result;
+                if (parseLong(reinterpret_cast<const char *>(&argv[i]), &result))
+                    return static_cast<int>(result);
+                else
+                    return 6;
             }
             else
                 vova++;
@@ -118,8 +130,22 @@ int mexit(vector<string> argv){
 
 
     result = -6;
-    return result;
+    return static_cast<int>(result);
 
+}
+
+bool parseLong(const char *str, long *val)
+{
+    char *temp;
+    bool rc = true;
+    errno = 0;
+    *val = strtol(str, &temp, 0);
+
+    if (temp == str || *temp != '\0' ||
+        ((*val == LONG_MIN || *val == LONG_MAX) && errno == ERANGE))
+        rc = false;
+
+    return rc;
 }
 
 int merrno_f(vector<string> argv) {

@@ -140,21 +140,27 @@ void execute_my_command(string &command, vector<string> options) {
         if(command == my_modules[i]){
             if(i == 0){
                 merrno = myhello(options);
+                return;
             } else if(i == 1){
                 merrno_(options);
+                return;
             } else if (i ==2){
                 merrno = mpwd(options);
+                return;
             } else if (i == 3){
                 merrno = mcd(options);
+                return;
             } else if (i == 4){
                 int k = mexit(options);
 
                 if (k != -1024){
                     merrno = abs(k);
                 } else merrno = 0;
+                merrno = min(merrno, 8);
                 if( k > -1){
                     exit(merrno);
                 }
+                return;
             }
 
         }
