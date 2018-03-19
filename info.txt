@@ -1,4 +1,0 @@
-
-1. to run program:
-
-g++ -o myshell main.cpp my_modules.cpp

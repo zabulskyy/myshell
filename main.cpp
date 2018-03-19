@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <dirent.h>
 #include <climits>
-//#include <my_modules.h>
-//#include "my_modules.h"
+//#include <defauld_modules.h>
+//#include "defauld_modules.h"
 
 using namespace std;
 
@@ -30,6 +30,8 @@ void execute(string &command, char *const *options);
 
 void print_error(int error_code);
 
+void execute_default_command(string command, vector<string> options);
+
 void execute_my_command(string command, vector<string> options);
 
 string get_error_string(int error_code);
@@ -38,7 +40,8 @@ void merrno_(vector<string> argv);
 
 char *prj_dir;  // myshell directory
 char cur_dir[1024];  // current directory
-vector<string> my_modules = {"myhello", "merrno", "mpwd", "mcd", "mexit"};
+vector<string> defauld_modules = {"myhello", "merrno", "mpwd", "mcd", "mexit"};
+vector<string> my_modules = {"myhello", "mycat"};
 int merrno = 0;
 
 int main() {
@@ -97,6 +100,11 @@ void parse_command(string cmd) {
     char *const *options = t_options;
 
 
+    if (find(defauld_modules.begin(), defauld_modules.end(), command) != defauld_modules.end()) {
+        execute_default_command(command, commands);
+        return;
+    }
+
 
     if (find(my_modules.begin(), my_modules.end(), command) != my_modules.end()) {
         execute_my_command(command, commands);
@@ -143,6 +151,28 @@ void execute(string &command, char *const *options) {
 }
 
 void execute_my_command(string command, vector<string> options) {
+
+    pid_t parent = getpid();
+    pid_t pid = fork();
+    int state = 0;
+
+    /*error*/
+    if (pid == -1) {
+        merrno = 3;
+        return;
+    }
+
+    /*child*/
+    if (pid == 0) {
+        execute(command, options);
+        return;
+    }
+
+    /*parent*/
+    waitpid(pid, &state, 0);
+}
+
+void execute_default_command(string command, vector<string> options) {
     // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
 
     if (command == "myhello") {
@@ -215,7 +245,8 @@ void print_error(int error_code) {
 
 void merrno_(vector<string> argv) {
     merrno = merrno_f(argv);
-    print_error(merrno);
+    cout << merrno << ": ";
+    //print_error(merrno);
 }
 
 int myhello(vector<string> argv) {
@@ -336,7 +367,7 @@ int mexit(vector<string> argv) {
                 else {
 
                     ss.clear();
-                    return 6;
+                    return -6;
 
                 }
             } else
@@ -346,7 +377,7 @@ int mexit(vector<string> argv) {
     }
 
 
-    result = -6;
+    result = 0;
     return result;
 
 }
