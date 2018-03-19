@@ -1,3 +1,4 @@
+#include <sstream>
 #include "my_modules.h"
 
 using namespace std;
@@ -102,14 +103,14 @@ int mexit(vector<string> argv){
     long n = argv.size();
 
     // arg code of error if need to exit positive else negative, if err code 0 and don't need to exit then -1024
-    long result = -1024;
+    int result = -1024;
     int vova = 0;
 
     for (int i = 0; i < n; i++) {
         if ((argv[i] == "-h" || argv[i] == "--help")) {
             cout << "help: \n mexit <code of end> [-h|--help] \n Exit from myshell." << endl;
             result = -1024;
-            return static_cast<int>(result);
+            return result;
         }
     }
 
@@ -117,10 +118,18 @@ int mexit(vector<string> argv){
         char * pEnd;
         if(!argv[i].empty() && !isspace(argv[i][0]) ){
             if (vova){
-                if (parseLong(reinterpret_cast<const char *>(&argv[i]), &result))
-                    return static_cast<int>(result);
-                else
+                stringstream ss;
+                // string stream
+                ss << argv[i];
+                ss >> result;
+                if (!ss.fail())
+                    return result;
+                else{
+
+                    ss.clear();
                     return 6;
+
+                }
             }
             else
                 vova++;
@@ -130,23 +139,11 @@ int mexit(vector<string> argv){
 
 
     result = -6;
-    return static_cast<int>(result);
+    return result;
 
 }
 
-bool parseLong(const char *str, long *val)
-{
-    char *temp;
-    bool rc = true;
-    errno = 0;
-    *val = strtol(str, &temp, 0);
 
-    if (temp == str || *temp != '\0' ||
-        ((*val == LONG_MIN || *val == LONG_MAX) && errno == ERANGE))
-        rc = false;
-
-    return rc;
-}
 
 int merrno_f(vector<string> argv) {
     long n = argv.size();

@@ -141,10 +141,10 @@ void execute_my_command(string &command, vector<string> options) {
             if(i == 0){
                 merrno = myhello(options);
                 return;
-            } else if(i == 1){
+            } else if (i == 1){
                 merrno_(options);
                 return;
-            } else if (i ==2){
+            } else if (i == 2){
                 merrno = mpwd(options);
                 return;
             } else if (i == 3){
@@ -155,7 +155,9 @@ void execute_my_command(string &command, vector<string> options) {
 
                 if (k != -1024){
                     merrno = abs(k);
-                } else merrno = 0;
+                } else
+                    merrno = 0;
+//                cout<<merrno<<endl;
                 merrno = min(merrno, 8);
                 if( k > -1){
                     exit(merrno);
