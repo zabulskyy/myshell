@@ -3,12 +3,23 @@
 #include <cstring>
 #include <vector>
 #include <wait.h>
+#include <sstream>
 #include <algorithm>
 #include <dirent.h>
 //#include <my_modules.h>
-#include "my_modules.h"
+//#include "my_modules.h"
 
 using namespace std;
+
+int myhello(vector<string> argv);
+
+int mpwd(vector<string> argv);
+
+int mcd(vector<string> argv);
+
+int mexit(vector<string> argv);
+
+int merrno_f(vector<string> argv);
 
 void parse_command(string &cmd);
 
@@ -32,7 +43,7 @@ int merrno = 0;
 int main() {
     string cmd;  // command
     int parse_result = 0;  // just in case
-
+    int i = 0;
     // get current directory
     if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
         cerr << "getcwd() error" << endl;
@@ -47,19 +58,17 @@ int main() {
         if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
             merrno = 4;
         }
-        if (errno) {
-            perror("\tError: ");
-        }
         if (merrno) {
             print_error(merrno);
         }
 
         merrno = 0;
-        cout << endl << cur_dir << " $ ";
-
+//        cout << endl << cur_dir << " $ ";
+        printf("\n%s %d$", cur_dir, ++i);
 
         if (getline(cin, cmd))
             parse_command(cmd);
+        cmd = "";
 
     }
     return 0;
@@ -133,40 +142,37 @@ void execute(string &command, char *const *options) {
     }
 }
 
-void execute_my_command(string &command, vector<string> options) {
+void execute_my_command(string command, vector<string> options) {
     // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
 
-    if(command == "myhello"){
+    if (command == "myhello") {
         merrno = myhello(options);
         return;
-    } else if (command == "merrno"){
+    } else if (command == "merrno") {
         merrno_(options);
         return;
-    } else if (command == "mpwd"){
+    } else if (command == "mpwd") {
         merrno = mpwd(options);
         return;
-    } else if (command == "mcd"){
+    } else if (command == "mcd") {
         merrno = mcd(options);
         return;
-    } else if (command == "mexit"){
+    } else if (command == "mexit") {
         int k = mexit(options);
 
-        if (k != -1024){
+        if (k != -1024) {
             merrno = abs(k);
         } else
             merrno = 0;
 //                cout<<merrno<<endl;
         merrno = min(merrno, 8);
-        if( k > -1){
-            print_error(merrno);
+        if (k > -1) {
+            if (merrno != 0)
+                print_error(merrno);
             exit(merrno);
         }
-            return;
+        return;
     }
-
-
-
-
 
 
 }
@@ -208,11 +214,165 @@ void print_error(int error_code) {
     cout << "\tError: " << get_error_string(error_code) << endl;
 }
 
-void merrno_(vector<string> argv){
+void merrno_(vector<string> argv) {
     merrno = merrno_f(argv);
     print_error(merrno);
 }
 
+int myhello(vector<string> argv) {
+    long n = argv.size();
+    int vova = 0;
+    for (int i = 0; i < n; i++) {
+        if (argv[i] == "-h" || argv[i] == "--help") {
+            cout << "help: \n my_hello [-h|--help] \n Print \"Hello World \"" << endl;
+            return 0;
+        } else if (!argv[i].empty() && !isspace(argv[i][0]))
+            if (vova)
+                return 6;
+            else
+                vova++;
+    }
+    cout << "Hello, World! \n";
+    return 0;
+//
+//    Hello, World!
+//
+//                /home/iryna/CLionProjects/myshell $ Hello, World!
+
+}
+
+int mpwd(vector<string> argv) {
+    long n = argv.size();
+    char dir[1024];
+    int vova = 0;
+    for (int i = 0; i < n; i++) {
+        if (argv[i] == "-h" || argv[i] == "--help") {
+            cout << "help: \n mpwd [-h|--help] \n Write current dir." << endl;
+            return 0;
+
+        } else if (!argv[i].empty() && !isspace(argv[i][0]))
+            if (vova)
+                return 6;
+            else
+                vova++;
+
+    }
+
+
+    if (getcwd(dir, sizeof(dir)) == nullptr) {
+        return 4;
+    }
+
+    cout << dir << endl;
+
+    return 0;
+//    /home/iryna/CLionProjects/myshell/cmake-build-debug
+//
+//                                                  /home/iryna/CLionProjects/myshell/cmake-build-debug $ /home/iryna/CLionProjects/myshell/cmake-build-debug
+
+}
+
+int mcd(vector<string> argv) {
+    long n = argv.size();
+
+    if (n == 0) {
+
+        return 7;
+    }
+    for (int i = 0; i < n; i++) {
+        if ((argv[i] == "-h" || argv[i] == "--help")) {
+            cout << "help: \n mcd <path> [-h|--help] \n Change current dir." << endl;
+            return 0;
+        }
+    }
+    int k = 0;
+    int vova = 0;
+    for (int i = 0; i < n; i++) {
+        if (!argv[i].empty() && !isspace(argv[i][0])) {
+
+            if (vova) {
+                //cout << argv[i] << endl;
+                if (argv[i] == ".") {
+                    return 0;
+                }
+
+                k = chdir(argv[i].c_str());
+
+                if (k != 0) {
+                    return 6;
+                }
+
+                return k;
+            } else
+                vova++;
+
+
+        }
+    }
+
+
+    return 6;
+}
+
+int mexit(vector<string> argv) {
+    long n = argv.size();
+
+    // arg code of error if need to exit positive else negative, if err code 0 and don't need to exit then -1024
+    int result = -1024;
+    int vova = 0;
+
+    for (int i = 0; i < n; i++) {
+        if ((argv[i] == "-h" || argv[i] == "--help")) {
+            cout << "help: \n mexit <code of end> [-h|--help] \n Exit from myshell." << endl;
+            result = -1024;
+            return result;
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        char *pEnd;
+        if (!argv[i].empty() && !isspace(argv[i][0])) {
+            if (vova) {
+                stringstream ss;
+                // string stream
+                ss << argv[i];
+                ss >> result;
+                if (!ss.fail())
+                    return result;
+                else {
+
+                    ss.clear();
+                    return 6;
+
+                }
+            } else
+                vova++;
+
+        }
+    }
+
+
+    result = -6;
+    return result;
+
+}
+
+
+int merrno_f(vector<string> argv) {
+    long n = argv.size();
+    int vova = 0;
+    for (int i = 0; i < n; i++) {
+        if ((argv[i] == "-h" || argv[i] == "--help")) {
+            cout << "help: \n merrno [-h|--help] \n Code of last error." << endl;
+            return 0;
+        } else if (!argv[i].empty() && !isspace(argv[i][0]))
+            if (vova)
+                return 6;
+            else
+                vova++;
+    }
+
+}
 
 
 /*
