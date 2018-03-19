@@ -136,30 +136,30 @@ void execute(string &command, char *const *options) {
 void execute_my_command(string &command, vector<string> options) {
     // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
 
-    for(int i = 0; i < my_modules.size(); i++){
-        if(command == my_modules[i]){
-            if(i == 0){
+    for (int i = 0; i < my_modules.size(); i++) {
+        if (command == my_modules[i]) {
+            if (i == 0) {
                 merrno = myhello(options);
                 return;
-            } else if (i == 1){
+            } else if (i == 1) {
                 merrno_(options);
                 return;
-            } else if (i == 2){
+            } else if (i == 2) {
                 merrno = mpwd(options);
                 return;
-            } else if (i == 3){
+            } else if (i == 3) {
                 merrno = mcd(options);
                 return;
-            } else if (i == 4){
+            } else if (i == 4) {
                 int k = mexit(options);
 
-                if (k != -1024){
+                if (k != -1024) {
                     merrno = abs(k);
                 } else
                     merrno = 0;
 //                cout<<merrno<<endl;
                 merrno = min(merrno, 8);
-                if( k > -1){
+                if (k > -1) {
                     exit(merrno);
                 }
                 return;
@@ -167,7 +167,6 @@ void execute_my_command(string &command, vector<string> options) {
 
         }
     }
-
 
 
 }
@@ -209,7 +208,7 @@ void print_error(int error_code) {
     cout << "\tError: " << get_error_string(error_code) << endl;
 }
 
-void merrno_(vector<string> argv){
+void merrno_(vector<string> argv) {
     merrno = merrno_f(argv);
     print_error(merrno);
 }
