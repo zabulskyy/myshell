@@ -41,27 +41,28 @@ vector<string> wildcards(string str){
 
 bool equal_words(char* first_let, char* second_let){
     bool t = false;
+    cout << first_let;
     if(*first_let == '/0' && *second_let == '/0')
         return true;
-    if(*first_let == "*" && *first_let != '/0' && *second_let == '/0')
+    if(*first_let == '*' && *first_let+1 != '/0' && *second_let == '/0')
         return false;
-    if(*first_let == "["){
-        *first_let++;
-        while(*first_let != "]" && *first_let != '/0') {
-            t = equal_words(*first_let,  *second_let) || t;
-            *first_let++;
+    if(*first_let == '['){
+        first_let++;
+        while(*first_let != ']' && *first_let != '/0') {
+            t = equal_words(first_let, second_let) || t;
+            first_let++;
         }
         if(*first_let == '/0')
-            return t && equal_words(*first_let, *second_let+1);
+            return t && equal_words(first_let, second_let + 1);
         else
-            return t && equal_words(*first_let+1, *second_let);
+            return t && equal_words(first_let + 1,second_let);
     }
-    if(*first_let == "?" || *first_let == *second_let)
+    if(*first_let == '?' || *first_let == *second_let)
         return equal_words(first_let+1, second_let+1);
-    if(*first_let == "*")
-        return equal_words(*first_let + 1, *second_let) || equal_words(*first_let, *second_let + 1);
+    if(*first_let == '*')
+        return equal_words(first_let + 1,second_let) ||
+               equal_words(first_let, second_let + 1);
 }
-
 
 int main(){
     wildcards("jrjrjr");
