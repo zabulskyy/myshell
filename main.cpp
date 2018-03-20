@@ -54,7 +54,8 @@ int main() {
     if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
         cerr << "getcwd() error";
         merrno = 4;
-    }    if (getcwd(prj_dir, sizeof(prj_dir)) == nullptr) {
+    }
+    if (getcwd(prj_dir, sizeof(prj_dir)) == nullptr) {
         cerr << "getcwd() error";
         merrno = 4;
     }
@@ -62,7 +63,7 @@ int main() {
         print_error(merrno);
 
     char *prj_dir = cur_dir;
-    wildcards("dkdk");
+//    wildcards("dkdk");
     while (true) {
 
         if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
@@ -75,14 +76,13 @@ int main() {
         merrno = 0;
         printf("\n%s $ ", cur_dir);
         if (getline(cin, cmd)) {
-            cout << cmd << endl;
             parse_command(cmd);
         }
     }
     return 0;
 }
 
-void parse_command(string cmd) {
+void parse_command(const string &cmd) {
 
     if (cmd.empty() ||
         cmd.find_first_not_of(' ') == string::npos ||
@@ -114,7 +114,8 @@ void parse_command(string cmd) {
 
 
     if (find(my_modules.begin(), my_modules.end(), command) != my_modules.end()) {
-        execute_my_command(command, commands);
+        command = ((string) prj_dir + "/../bin/") + command;
+        execute_my_command(command, options);
         return;
     }
 
@@ -139,12 +140,12 @@ void parse_command(string cmd) {
 
 void execute(const string &command, char *const *options) {
     int e = execve((command).c_str(), options, environ);
-    if (e){
+    if (e) {
         merrno = 2;
     }
 }
 
-void execute_my_command(string command, char *const *options) {
+void execute_my_command(const string &command, char *const *options) {
 
     pid_t parent = getpid();
     pid_t pid = fork();
@@ -166,7 +167,7 @@ void execute_my_command(string command, char *const *options) {
     waitpid(pid, &state, 0);
 }
 
-void execute_default_command(string command, vector<string> options) {
+void execute_default_command(const string &command, const vector<string> &options) {
     // {"myhello", "merrno", "mpwd", "mcd", "mexit"}
 
     if (command == "myhello") {
@@ -222,7 +223,7 @@ string get_error_string(int error_code) {
     vector<string> errors;
     errors = {"",
               "permission denied",
-              "file/folder not found",
+              "no such file or directory",
               "no such process",
               "getcwd() error",
               "no such command",
