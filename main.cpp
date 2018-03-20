@@ -66,7 +66,7 @@ int main() {
         print_error(merrno);
 
     char *prj_dir = cur_dir;
-//    wildcards("*.???");
+    wildcards("bin/*[jhgy]??[hjt]");
     while (true) {
 
         if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
@@ -79,6 +79,8 @@ int main() {
         merrno = 0;
         printf("\n%s $ ", cur_dir);
         if (getline(cin, cmd)) {
+//            for(auto elem : wildcards(cmd))
+//                parse_command(elem);
             parse_command(cmd);
         }
     }
@@ -117,7 +119,7 @@ void parse_command(const string &cmd) {
 
 
     if (find(my_modules.begin(), my_modules.end(), command) != my_modules.end()) {
-        command = ((string) prj_dir + "/../bin/") + command;
+        command = ((string) prj_dir + "/bin/") + command;
         execute_my_command(command, options);
         return;
     }
@@ -196,6 +198,7 @@ void execute_default_command(const string &command, const vector<string> &option
         if (k > -1) {
             if (merrno != 0)
                 print_error(merrno);
+            cout<<endl;
             exit(merrno);
         }
         return;
@@ -240,7 +243,7 @@ string get_error_string(int error_code) {
 }
 
 void print_error(int error_code) {
-    cout << "\tError: " << get_error_string(error_code);
+    cout << "\tError " << merrno<<": "<<get_error_string(error_code);
 }
 
 void merrno_(vector<string> argv) {
@@ -407,26 +410,27 @@ vector<string> wildcards(string str){
     size_t found = str.find_last_of("/\\");
     string dir_open, mask ;
     if (found != string::npos){
-        dir_open = str.substr(0,found);
+        dir_open = str.substr(0,found+1);
         mask = str.substr(found+1);
     } else {
         dir_open = cur_dir;
 
         mask = str;
     }
+    //DIR *dirp = opendir(dir_open);
     int n;
     char *word_check;
-    n = scandir("..", &namelist, nullptr, alphasort);
+    n = scandir((dir_open).c_str(), &namelist, nullptr, alphasort);
     if (n == -1) {
         merrno = 9;
         return res;
     }
 
-    while (n--) {
+    while (n--> 2) {
         word_check = namelist[n]->d_name;
         if(equal_words(mask, 0, word_check, 0)) {
             res.emplace_back(word_check);
-//            printf("\n%s ", word_check);
+            printf("\n%s ", word_check);
         }
         free(namelist[n]);
     }
@@ -442,22 +446,24 @@ bool equal_words(string first, int i, string second, int j){
         return false;
     if(first[i] == '['){
         i++;
-        while( first.size() == i && first[i] != ']'){
+        //cout << (first.size() == i && first[i] != ']' )<< endl;
+        while( first.size() != i && first[i] != ']'){
             t = t || (first[i] == second[j]);
+            //cout << t << endl;
             i++;
         }
         if(first.size() == i)
             return t && equal_words(first, i, second, j+1);
         else
-            return t && equal_words(first, i+1, second ,j);
+            return t && equal_words(first, i+1, second ,j+1);
 
     }
 
     if(first[i] == '?' || first[i] == second[j])
         return equal_words(first, i+1, second, j+1);
     if(first[i] == '*')
-        return equal_words(first, i+1, second, j+1) || equal_words(first, i, second, j+1) ;
-    // ||  equal_words(first, i+1, second, j+1)
+        return equal_words(first, i+1, second, j) || equal_words(first, i, second, j+1);
+     //||  equal_words(first, i+1, second, j+1);
     return false;
 }
 
