@@ -3,4 +3,4 @@ project(myshell)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(main.cpp)
+add_executable(myshell main.cpp)

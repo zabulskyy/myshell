@@ -1,6 +1,5 @@
 #include <iostream>
 #include <unistd.h>
-#include <cstring>
 #include <vector>
 #include <wait.h>
 #include <sstream>
@@ -66,7 +65,7 @@ int main() {
         print_error(merrno);
 
     char *prj_dir = cur_dir;
-    wildcards("bin/*[jhgy]??[hjt]");
+//    wildcards("bin/*[jhgy]??[hjt]");
     while (true) {
 
         if (getcwd(cur_dir, sizeof(cur_dir)) == nullptr) {
@@ -79,8 +78,6 @@ int main() {
         merrno = 0;
         printf("\n%s $ ", cur_dir);
         if (getline(cin, cmd)) {
-//            for(auto elem : wildcards(cmd))
-//                parse_command(elem);
             parse_command(cmd);
         }
     }
@@ -99,17 +96,24 @@ void parse_command(const string &cmd) {
     split_str(cmd, commands, ' ');
 
 
-    string command = commands[0];
-
-    char *t_options[commands.size() + 1];
+    string command;
+    for (char j : commands[0]) {
+        command.push_back(j);
+    }
+    char * t_options[commands.size() + 1];
 
     for (int i = 0; i < commands.size(); ++i) {
-        t_options[i] = const_cast<char *>(commands[i].c_str());
+        if (i > 0) {
+            string temp = (string) cur_dir + '/' + commands[i];
+            t_options[i] = const_cast<char *>((temp).c_str());
+
+        } else
+            t_options[i] = const_cast<char *>((commands[i]).c_str());
     }
 
     t_options[commands.size()] = {nullptr};
 
-    char *const *options = t_options;
+//    char *const *options = t_options;
 
 
     if (find(defauld_modules.begin(), defauld_modules.end(), command) != defauld_modules.end()) {
@@ -120,30 +124,50 @@ void parse_command(const string &cmd) {
 
     if (find(my_modules.begin(), my_modules.end(), command) != my_modules.end()) {
         command = ((string) prj_dir + "/bin/") + command;
-        execute_my_command(command, options);
+        execute_my_command(command, t_options);
         return;
     }
 
-
-    pid_t parent = getpid();
-    pid_t pid = fork();
-    int state = 0;
-
-    if (pid == 0) {
-        /*child*/
-        execute(command, options);
-        return;
-    } else if (pid > 0) {
-        /*parent*/
-        waitpid(pid, &state, 0);
-    } else {
-        /*error*/
-        merrno = 3;
+    for (int i = 0; i < 2; ++i) {
+        cout << "(((((" << t_options[i] << endl;
     }
 
+    /* FUCK FUCK FUCK FUCK FUCK FUCK FUCK FUCK */
+    vector<string> wild_commands = wildcards(command);
+    /* FUCK FUCK FUCK FUCK FUCK FUCK FUCK FUCK */
+
+    for (int i = 0; i < 2; ++i) {
+        cout << "(((((" << t_options[i] << endl;
+    }
+
+
+    for (auto elem : wild_commands) {
+        pid_t parent = getpid();
+        pid_t pid = fork();
+        int state = 0;
+
+        if (pid == 0) {
+            /*child*/
+            for (int i = 0; i < 2; ++i) {
+                cout << "(((((" << t_options[i] << endl;
+            }
+            execute(elem, t_options);
+            return;
+        } else if (pid > 0) {
+            /*parent*/
+            waitpid(pid, &state, 0);
+        } else {
+            /*error*/
+            merrno = 3;
+        }
+    }
 }
 
-void execute(const string &command, char *const *options) {
+void execute(const string &command, char *const options[]) {
+    cout << ")))))))))))" << command << endl;
+    for (int i = 0; i < 2; ++i) {
+        cout << "(((((" << options[i] << endl;
+    }
     int e = execve((command).c_str(), options, environ);
     if (e) {
         merrno = 2;
@@ -198,33 +222,67 @@ void execute_default_command(const string &command, const vector<string> &option
         if (k > -1) {
             if (merrno != 0)
                 print_error(merrno);
-            cout<<endl;
+            cout << endl;
             exit(merrno);
         }
         return;
     }
-
-
 }
 
 
 void split_str(const string &txt, vector<string> &strs, char ch) {
-    size_t pos = txt.find(ch);
-    size_t initialPos = 0;
-    strs.clear();
+    long spacepos = -1;
+    bool quote = false;
+    string ss;
 
-    // Decompose statement
-    while (pos != std::string::npos) {
-        strs.push_back(txt.substr(initialPos, pos - initialPos));
-        initialPos = pos + 1;
+    for (unsigned long i = 0; i < txt.size(); ++i) {
+        if (txt[i] == '\"') {
+            if (i == 0 || txt[i - 1] != '\\') {
+                quote = !quote;
+            } else {
 
-        pos = txt.find(ch, initialPos);
+            }
+        }
+        if (quote)
+            continue;
+        if (txt[i] == ' ') {
+            if (i - spacepos - 1) {
+                ss = txt.substr((unsigned long) spacepos + 1, i - spacepos - 1);
+                if (ss[0] == '\"') {
+                    ss.erase(0, 1);
+                    ss.erase(ss.size() - 1, 1);
+                } else if (ss[0] == '\'') {
+                    ss.erase(0, 1);
+                    ss.erase(ss.size() - 1, 1);
+                    for (int j = 0; j < ss.length(); ++j) {
+                        if (ss[j] == '\\') {
+                            ss.replace((unsigned long) j, 1, "\\\\");
+                        }
+                    }
+                }
+                strs.push_back(ss);
+            }
+            spacepos = i;
+        }
     }
-
-    // Add the last one
-    strs.push_back(txt.substr(initialPos, std::min(pos, txt.size()) - initialPos + 1));
-
+    ss = txt.substr((unsigned long) spacepos + 1, txt.size() - spacepos - 1);
+    if (ss[0] == '\"') {
+        ss.erase(0, 1);
+        ss.erase(ss.size() - 1, 1);
+    } else if (ss[0] == '\'') {
+        ss.erase(0, 1);
+        ss.erase(ss.size() - 1, 1);
+        int j = 0;
+        while (j++ < ss.length()) {
+            if (ss[j] == '\\') {
+                ss.replace((unsigned long) j, 1, "\\\\");
+                ++j;
+            }
+        }
+    }
+    strs.push_back(ss);
 };
+
 
 string get_error_string(int error_code) {
     vector<string> errors;
@@ -243,13 +301,12 @@ string get_error_string(int error_code) {
 }
 
 void print_error(int error_code) {
-    cout << "\tError " << merrno<<": "<<get_error_string(error_code);
+    cout << "\tError " << merrno << ": " << get_error_string(error_code);
 }
 
 void merrno_(vector<string> argv) {
     merrno = merrno_f(argv);
-    cout << merrno << ": ";
-    //print_error(merrno);
+    //cout << merrno << ": ";
 }
 
 int myhello(vector<string> argv) {
@@ -327,7 +384,7 @@ int mcd(vector<string> argv) {
                 k = chdir(argv[i].c_str());
 
                 if (k != 0) {
-                    return 6;
+                    return 2;
                 }
 
                 return k;
@@ -339,7 +396,7 @@ int mcd(vector<string> argv) {
     }
 
 
-    return 6;
+    return 2;
 }
 
 int mexit(vector<string> argv) {
@@ -380,8 +437,7 @@ int mexit(vector<string> argv) {
     }
 
 
-    result = 0;
-    return result;
+    return 0;
 
 }
 
@@ -402,16 +458,16 @@ int merrno_f(vector<string> argv) {
 
 }
 
-vector<string> wildcards(string str){
+vector<string> wildcards(string str) {
     // *.txt, ab??.dat, xy[klm].sh
 
     vector<string> res;
     struct dirent **namelist;
     size_t found = str.find_last_of("/\\");
-    string dir_open, mask ;
-    if (found != string::npos){
-        dir_open = str.substr(0,found+1);
-        mask = str.substr(found+1);
+    string dir_open, mask;
+    if (found != string::npos) {
+        dir_open = str.substr(0, found + 1);
+        mask = str.substr(found + 1);
     } else {
         dir_open = cur_dir;
 
@@ -420,50 +476,51 @@ vector<string> wildcards(string str){
     //DIR *dirp = opendir(dir_open);
     int n;
     char *word_check;
+    string y = dir_open;
+
     n = scandir((dir_open).c_str(), &namelist, nullptr, alphasort);
     if (n == -1) {
         merrno = 9;
         return res;
     }
 
-    while (n--> 2) {
+    while (--n > 1) {
         word_check = namelist[n]->d_name;
-        if(equal_words(mask, 0, word_check, 0)) {
-            res.emplace_back(word_check);
-            printf("\n%s ", word_check);
+        if (equal_words(mask, 0, word_check, 0)) {
+            y = dir_open;
+            y += word_check;
+            res.emplace_back(y);
         }
         free(namelist[n]);
     }
     free(namelist);
+    //if(res.size()>0 res[res.size() - 1] == ".")
     return res;
 }
 
-bool equal_words(string first, int i, string second, int j){
+bool equal_words(string first, int i, string second, int j) {
     bool t = false;
-    if(first.size() == i && second.size() == j)
+    if (first.size() == i && second.size() == j)
         return true;
-    if(first[i] == '*' && first.size() != i+1 && second.size() == j)
+    if (first[i] == '*' && first.size() != i + 1 && second.size() == j)
         return false;
-    if(first[i] == '['){
+    if (first[i] == '[') {
         i++;
-        //cout << (first.size() == i && first[i] != ']' )<< endl;
-        while( first.size() != i && first[i] != ']'){
+        while (first.size() != i && first[i] != ']') {
             t = t || (first[i] == second[j]);
-            //cout << t << endl;
             i++;
         }
-        if(first.size() == i)
-            return t && equal_words(first, i, second, j+1);
+        if (first.size() == i)
+            return t && equal_words(first, i, second, j + 1);
         else
-            return t && equal_words(first, i+1, second ,j+1);
+            return t && equal_words(first, i + 1, second, j + 1);
 
     }
 
-    if(first[i] == '?' || first[i] == second[j])
-        return equal_words(first, i+1, second, j+1);
-    if(first[i] == '*')
-        return equal_words(first, i+1, second, j) || equal_words(first, i, second, j+1);
-     //||  equal_words(first, i+1, second, j+1);
+    if (first[i] == '?' || first[i] == second[j])
+        return equal_words(first, i + 1, second, j + 1);
+    if (first[i] == '*')
+        return equal_words(first, i + 1, second, j) || equal_words(first, i, second, j + 1);
     return false;
 }
 
