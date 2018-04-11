@@ -1,10 +1,12 @@
 #include <iostream>
 #include <unistd.h>
+#include <cstring>
 #include <vector>
 #include <wait.h>
 #include <sstream>
 #include <algorithm>
 #include <dirent.h>
+#include <errno.h>
 
 //#include <defauld_modules.h>
 //#include "defauld_modules.h"
@@ -42,11 +44,13 @@ vector<string> wildcards(string str);
 
 bool equal_words(string first, int i, string second, int j);
 
+string vector_str_str(vector<string> vec);
+
 char prj_dir[1024];;  // myshell directory
 const char *mod_dir;  // modules directory
 char cur_dir[1024];   // current directory
-vector<string> defauld_modules = {"merrno", "mpwd", "mcd", "mexit"};
-vector<string> my_modules = {"myhello", "mycat"};
+vector<string> defauld_modules = {"merrno", "mpwd", "mcd", "mexit"}; //TODO make local for main()
+vector<string> my_modules = {"myhello", "mycat"}; //TODO make local for main()
 int merrno = 0;
 
 int main() {
@@ -75,7 +79,7 @@ int main() {
             print_error(merrno);
         }
 
-        merrno = 0;
+        // merrno = 0;
         printf("\n%s $ ", cur_dir);
         if (getline(cin, cmd)) {
             parse_command(cmd);
@@ -96,24 +100,20 @@ void parse_command(const string &cmd) {
     split_str(cmd, commands, ' ');
 
 
-    string command;
-    for (char j : commands[0]) {
-        command.push_back(j);
-    }
-    char * t_options[commands.size() + 1];
+    string command = commands[0];
+    char *t_options[commands.size() + 1];
 
     for (int i = 0; i < commands.size(); ++i) {
-        if (i > 0) {
-            string temp = (string) cur_dir + '/' + commands[i];
-            t_options[i] = const_cast<char *>((temp).c_str());
-
-        } else
-            t_options[i] = const_cast<char *>((commands[i]).c_str());
+//        cout<<vector_str_str(wildcards(commands[i]))<<endl;
+        vector<string> wild_res = wildcards(commands[i]);
+        cout << vector_str_str(wild_res) << endl;
+        t_options[i] = const_cast<char *>(vector_str_str(wild_res).c_str());
+        //const_cast<char *>(commands[i].c_str()); // func vector<string> char*
     }
 
     t_options[commands.size()] = {nullptr};
 
-//    char *const *options = t_options;
+    char *const *options = t_options;
 
 
     if (find(defauld_modules.begin(), defauld_modules.end(), command) != defauld_modules.end()) {
@@ -124,54 +124,58 @@ void parse_command(const string &cmd) {
 
     if (find(my_modules.begin(), my_modules.end(), command) != my_modules.end()) {
         command = ((string) prj_dir + "/bin/") + command;
-        execute_my_command(command, t_options);
+        execute_my_command(command, options);
         return;
     }
 
-    for (int i = 0; i < 2; ++i) {
-        cout << "(((((" << t_options[i] << endl;
-    }
-
-    /* FUCK FUCK FUCK FUCK FUCK FUCK FUCK FUCK */
     vector<string> wild_commands = wildcards(command);
-    /* FUCK FUCK FUCK FUCK FUCK FUCK FUCK FUCK */
 
-    for (int i = 0; i < 2; ++i) {
-        cout << "(((((" << t_options[i] << endl;
+    if (wild_commands.size() == 0) {
+        merrno = 2;
     }
-
 
     for (auto elem : wild_commands) {
-        pid_t parent = getpid();
-        pid_t pid = fork();
-        int state = 0;
-
-        if (pid == 0) {
-            /*child*/
-            for (int i = 0; i < 2; ++i) {
-                cout << "(((((" << t_options[i] << endl;
-            }
-            execute(elem, t_options);
-            return;
-        } else if (pid > 0) {
-            /*parent*/
-            waitpid(pid, &state, 0);
-        } else {
-            /*error*/
-            merrno = 3;
-        }
+        execute(elem, options);
     }
 }
 
-void execute(const string &command, char *const options[]) {
-    cout << ")))))))))))" << command << endl;
-    for (int i = 0; i < 2; ++i) {
-        cout << "(((((" << options[i] << endl;
+
+string vector_str_str(vector<string> vec) {
+    string res;
+    for (const string &elem: vec) {
+        res += elem + ' ';
     }
-    int e = execve((command).c_str(), options, environ);
-    if (e) {
-        merrno = 2;
+    res.pop_back();
+    return res;
+
+}
+
+void execute(const string &command, char *const *options) {
+    pid_t parent = getpid();
+    pid_t pid = fork();
+    int state = 0;
+
+    if (pid == 0) {
+        /*child*/
+        int e = execve((command).c_str(), options, environ);
+        if (e == -1) {
+            cerr << "exit with error ";
+            print_error(e);
+            merrno = 2;
+            exit(2);
+        }
+        return;
+    } else if (pid > 0) {
+        /*parent*/
+        waitpid(pid, &state, 0);
+    } else {
+        /*error*/
+        merrno = 3;
     }
+
+
+//    cout<<e<<endl;
+
 }
 
 void execute_my_command(const string &command, char *const *options) {
@@ -203,6 +207,7 @@ void execute_default_command(const string &command, const vector<string> &option
         merrno = myhello(options);
         return;
     } else if (command == "merrno") {
+//        cout << merrno<<endl;
         merrno_(options);
         return;
     } else if (command == "mpwd") {
@@ -305,8 +310,9 @@ void print_error(int error_code) {
 }
 
 void merrno_(vector<string> argv) {
-    merrno = merrno_f(argv);
-    //cout << merrno << ": ";
+    //cout << argv[0]<<endl;
+    if (argv.size() > 1)
+        merrno = merrno_f(argv);
 }
 
 int myhello(vector<string> argv) {
@@ -460,41 +466,63 @@ int merrno_f(vector<string> argv) {
 
 vector<string> wildcards(string str) {
     // *.txt, ab??.dat, xy[klm].sh
-
+//    cout<<str<<endl;
     vector<string> res;
     struct dirent **namelist;
     size_t found = str.find_last_of("/\\");
-    string dir_open, mask;
-    if (found != string::npos) {
-        dir_open = str.substr(0, found + 1);
-        mask = str.substr(found + 1);
-    } else {
-        dir_open = cur_dir;
+    vector<int> n = {-1, -1};
 
-        mask = str;
+    vector<string> mask = {str.substr(found + 1), ""};
+    string bla;
+    if (str.size() > 0 && str[0] != '/')
+        bla = '/' + str.substr(0, found + 1);
+    else
+        bla = str.substr(0, found + 1);
+    vector<string> dir_open = {cur_dir + bla, ""};
+
+    n[0] = scandir((dir_open[0]).c_str(), &namelist, nullptr, alphasort);
+    if (found != string::npos) {
+
+
+        dir_open[1] = str.substr(0, found + 1);
+        mask[1] = str.substr(found + 1);
+
+        n[1] = scandir((dir_open[1]).c_str(), &namelist, nullptr, alphasort);
+
+
     }
     //DIR *dirp = opendir(dir_open);
-    int n;
-    char *word_check;
-    string y = dir_open;
 
-    n = scandir((dir_open).c_str(), &namelist, nullptr, alphasort);
-    if (n == -1) {
+    char *word_check;
+    string y;
+//    cout<<y<<endl;
+    if (n[0] == -1 && n[1] == -1) {
         merrno = 9;
         return res;
     }
+    for (int i = 0; i < n.size(); ++i) {
+        while (--n[i] > 1) {
+            word_check = namelist[n[i]]->d_name;
 
-    while (--n > 1) {
-        word_check = namelist[n]->d_name;
-        if (equal_words(mask, 0, word_check, 0)) {
-            y = dir_open;
-            y += word_check;
-            res.emplace_back(y);
+            cout << word_check << endl;
+            if (equal_words(mask[i], 0, word_check, 0)) {
+                y = dir_open[i] + word_check;
+                //            y = word_check;
+                res.emplace_back(y);
+
+            }
+            cout << (int) n[i] << endl;
+            free(namelist[n[i]]);
+            cout << n[i] << endl;
+
+
         }
-        free(namelist[n]);
+        free(namelist);
+
     }
-    free(namelist);
+
     //if(res.size()>0 res[res.size() - 1] == ".")
+
     return res;
 }
 
