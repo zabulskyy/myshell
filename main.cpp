@@ -6,7 +6,9 @@
 #include <sstream>
 #include <algorithm>
 #include <dirent.h>
-#include <errno.h>
+#include <cerrno>
+#include <sys/stat.h>
+#include <bits/stat.h>
 
 //#include <defauld_modules.h>
 //#include "defauld_modules.h"
@@ -46,11 +48,15 @@ bool equal_words(string first, int i, string second, int j);
 
 string vector_str_str(vector<string> vec);
 
+bool check_for_special_symbols(string str);
+
+bool exists_test(const std::string &name);
+
 char prj_dir[1024];;  // myshell directory
 const char *mod_dir;  // modules directory
 char cur_dir[1024];   // current directory
-vector<string> defauld_modules = {"merrno", "mpwd", "mcd", "mexit"}; //TODO make local for main()
-vector<string> my_modules = {"myhello", "mycat"}; //TODO make local for main()
+vector<string> defauld_modules = {"merrno", "mpwd", "mcd", "mexit"};
+vector<string> my_modules = {"myhello", "mycat"};
 int merrno = 0;
 
 int main() {
@@ -101,17 +107,26 @@ void parse_command(const string &cmd) {
 
 
     string command = commands[0];
-    char *t_options[commands.size() + 1];
+    vector<string> v_opt;
 
-    for (int i = 0; i < commands.size(); ++i) {
+    for (const auto &comm : commands) {
 //        cout<<vector_str_str(wildcards(commands[i]))<<endl;
-        vector<string> wild_res = wildcards(commands[i]);
-        cout << vector_str_str(wild_res) << endl;
-        t_options[i] = const_cast<char *>(vector_str_str(wild_res).c_str());
+        vector<string> wild_res = wildcards(comm);
+//        cout << vector_str_str(wild_res) << endl;
+//        string x = vector_str_str(wild_res);
+//        char *y = new char[x.length() + 1];
+//        std::strcpy(y, x.c_str());//
+        for (auto x: wild_res)
+            v_opt.emplace_back(x);
         //const_cast<char *>(commands[i].c_str()); // func vector<string> char*
     }
 
-    t_options[commands.size()] = {nullptr};
+    char *t_options[v_opt.size() + 1];
+    for (int i = 0; i < v_opt.size(); ++i) {
+        t_options[i] = new char[v_opt[i].length() + 1];
+        std::strcpy(t_options[i], v_opt[i].c_str());
+    }
+    t_options[v_opt.size()] = {nullptr};
 
     char *const *options = t_options;
 
@@ -135,7 +150,9 @@ void parse_command(const string &cmd) {
     }
 
     for (auto elem : wild_commands) {
+
         execute(elem, options);
+
     }
 }
 
@@ -149,6 +166,7 @@ string vector_str_str(vector<string> vec) {
     return res;
 
 }
+
 
 void execute(const string &command, char *const *options) {
     pid_t parent = getpid();
@@ -172,32 +190,12 @@ void execute(const string &command, char *const *options) {
         /*error*/
         merrno = 3;
     }
-
-
-//    cout<<e<<endl;
-
 }
 
 void execute_my_command(const string &command, char *const *options) {
 
-    pid_t parent = getpid();
-    pid_t pid = fork();
-    int state = 0;
+    execute(command, options);
 
-    /*error*/
-    if (pid == -1) {
-        merrno = 3;
-        return;
-    }
-
-    /*child*/
-    if (pid == 0) {
-        execute(command, options);
-        return;
-    }
-
-    /*parent*/
-    waitpid(pid, &state, 0);
 }
 
 void execute_default_command(const string &command, const vector<string> &options) {
@@ -330,10 +328,7 @@ int myhello(vector<string> argv) {
     }
     cout << "Hello, World!";
     return 0;
-//
-//    Hello, World!
-//
-//                /home/iryna/CLionProjects/myshell $ Hello, World!
+
 
 }
 
@@ -467,6 +462,7 @@ int merrno_f(vector<string> argv) {
 vector<string> wildcards(string str) {
     // *.txt, ab??.dat, xy[klm].sh
 //    cout<<str<<endl;
+
     vector<string> res;
     struct dirent **namelist;
     size_t found = str.find_last_of("/\\");
@@ -483,16 +479,22 @@ vector<string> wildcards(string str) {
     n[0] = scandir((dir_open[0]).c_str(), &namelist, nullptr, alphasort);
     if (found != string::npos) {
 
-
         dir_open[1] = str.substr(0, found + 1);
         mask[1] = str.substr(found + 1);
-
         n[1] = scandir((dir_open[1]).c_str(), &namelist, nullptr, alphasort);
 
 
     }
     //DIR *dirp = opendir(dir_open);
-
+    if (!check_for_special_symbols(str)) {
+        string path_file;
+        for (int i = 0; i < n.size(); ++i) {
+            path_file = dir_open[i] + mask[i];
+            if (exists_test(path_file))
+                res.emplace_back(path_file);
+        }
+        return res;
+    }
     char *word_check;
     string y;
 //    cout<<y<<endl;
@@ -500,20 +502,22 @@ vector<string> wildcards(string str) {
         merrno = 9;
         return res;
     }
+
+
     for (int i = 0; i < n.size(); ++i) {
         while (--n[i] > 1) {
             word_check = namelist[n[i]]->d_name;
 
-            cout << word_check << endl;
+//            cout<<word_check/binendl;
             if (equal_words(mask[i], 0, word_check, 0)) {
                 y = dir_open[i] + word_check;
                 //            y = word_check;
                 res.emplace_back(y);
 
             }
-            cout << (int) n[i] << endl;
+//            cout<<(int)n[i]<<endl;
             free(namelist[n[i]]);
-            cout << n[i] << endl;
+//            cout<<n[i]<<endl;
 
 
         }
@@ -524,6 +528,19 @@ vector<string> wildcards(string str) {
     //if(res.size()>0 res[res.size() - 1] == ".")
 
     return res;
+}
+
+bool check_for_special_symbols(string str) {
+    for (char el : str) {
+        if (el == '*' || el == '[' || el == '?')
+            return true;
+    }
+    return false;
+}
+
+bool exists_test(const std::string &name) {
+    struct stat buffer{};
+    return (stat(name.c_str(), &buffer) == 0);
 }
 
 bool equal_words(string first, int i, string second, int j) {
@@ -548,7 +565,7 @@ bool equal_words(string first, int i, string second, int j) {
     if (first[i] == '?' || first[i] == second[j])
         return equal_words(first, i + 1, second, j + 1);
     if (first[i] == '*')
-        return equal_words(first, i + 1, second, j) || equal_words(first, i, second, j + 1);
+        return equal_words(first, i, second, j + 1) || equal_words(first, i + 1, second, j);
     return false;
 }
 
