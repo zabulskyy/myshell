@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zabulskyy/UCU/OperatingSystems/myshell/src/mycat.cpp
+iostream
+-
+stdlib.h
+-
+fstream
+-
+string
+-
+ctype.h
+-
+fcntl.h
+-
+unistd.h
+-
+

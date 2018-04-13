@@ -1,0 +1,7 @@
+/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/myls.dir
+/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/rebuild_cache.dir
+/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/myshell.dir
+/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/myrm.dir
+/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/mycat.dir
+/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/edit_cache.dir
+/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/myhello.dir

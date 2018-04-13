@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zabulskyy/UCU/OperatingSystems/myshell/src/main.cpp
+iostream
+-
+unistd.h
+-
+cstring
+-
+vector
+-
+wait.h
+-
+sstream
+-
+algorithm
+-
+dirent.h
+-
+cerrno
+-
+sys/stat.h
+-
+bits/stat.h
+-
+

@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zabulskyy/UCU/OperatingSystems/myshell/src/myls.cpp
+iostream
+-
+map
+-
+vector
+-
+dirent.h
+-
+sys/stat.h
+-
+ctime
+-
+cstring
+-
+sstream
+-
+algorithm
+-
+unistd.h
+-
+
