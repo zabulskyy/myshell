@@ -1,4 +1,5 @@
 /home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/myls.dir
+/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/mymkdir.dir
 /home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/rebuild_cache.dir
 /home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/myshell.dir
 /home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles/myrm.dir

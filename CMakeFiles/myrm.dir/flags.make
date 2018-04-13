@@ -6,5 +6,5 @@ CXX_FLAGS = -g   -std=gnu++11
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/zabulskyy/UCU/OperatingSystems/myshell/bin -I/home/zabulskyy/UCU/OperatingSystems/myshell/src 
+CXX_INCLUDES = -I/home/zabulskyy/UCU/OperatingSystems/myshell/src 
 

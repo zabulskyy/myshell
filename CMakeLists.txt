@@ -13,6 +13,8 @@ add_executable(myshell src/main.cpp)
 add_executable(myrm src/myrm.cpp)
 add_executable(mycat src/mycat.cpp)
 add_executable(myhello src/myhello.cpp)
+add_executable(mymkdir src/mymkdir.cpp)
 add_executable(myls src/myls.cpp)
 
 target_link_libraries(myrm ${Boost_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY} ${Boost_REGEX_LIBRARY})
+target_link_libraries(mymkdir ${Boost_LIBRARIES} ${Boost_FILESYSTEM_LIBRARY})

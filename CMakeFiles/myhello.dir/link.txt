@@ -1,1 +1,1 @@
-/usr/bin/c++   -g   CMakeFiles/myhello.dir/src/myhello.cpp.o  -o myhello 
+/usr/bin/c++   -g   CMakeFiles/myhello.dir/src/myhello.cpp.o  -o myhello -rdynamic 

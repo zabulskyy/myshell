@@ -97,13 +97,50 @@ clean: CMakeFiles/myls.dir/clean
 .PHONY : clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/mymkdir.dir
+
+# All Build rule for target.
+CMakeFiles/mymkdir.dir/all:
+	$(MAKE) -f CMakeFiles/mymkdir.dir/build.make CMakeFiles/mymkdir.dir/depend
+	$(MAKE) -f CMakeFiles/mymkdir.dir/build.make CMakeFiles/mymkdir.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles --progress-num=7,8 "Built target mymkdir"
+.PHONY : CMakeFiles/mymkdir.dir/all
+
+# Include target in all.
+all: CMakeFiles/mymkdir.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/mymkdir.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/mymkdir.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles 0
+.PHONY : CMakeFiles/mymkdir.dir/rule
+
+# Convenience name for target.
+mymkdir: CMakeFiles/mymkdir.dir/rule
+
+.PHONY : mymkdir
+
+# clean rule for target.
+CMakeFiles/mymkdir.dir/clean:
+	$(MAKE) -f CMakeFiles/mymkdir.dir/build.make CMakeFiles/mymkdir.dir/clean
+.PHONY : CMakeFiles/mymkdir.dir/clean
+
+# clean rule for target.
+clean: CMakeFiles/mymkdir.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/myshell.dir
 
 # All Build rule for target.
 CMakeFiles/myshell.dir/all:
 	$(MAKE) -f CMakeFiles/myshell.dir/build.make CMakeFiles/myshell.dir/depend
 	$(MAKE) -f CMakeFiles/myshell.dir/build.make CMakeFiles/myshell.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles --progress-num=9,10 "Built target myshell"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles --progress-num=11,12 "Built target myshell"
 .PHONY : CMakeFiles/myshell.dir/all
 
 # Include target in all.
@@ -140,7 +177,7 @@ clean: CMakeFiles/myshell.dir/clean
 CMakeFiles/myrm.dir/all:
 	$(MAKE) -f CMakeFiles/myrm.dir/build.make CMakeFiles/myrm.dir/depend
 	$(MAKE) -f CMakeFiles/myrm.dir/build.make CMakeFiles/myrm.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles --progress-num=7,8 "Built target myrm"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/zabulskyy/UCU/OperatingSystems/myshell/CMakeFiles --progress-num=9,10 "Built target myrm"
 .PHONY : CMakeFiles/myrm.dir/all
 
 # Include target in all.

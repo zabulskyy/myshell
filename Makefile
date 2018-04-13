@@ -124,6 +124,19 @@ myls/fast:
 .PHONY : myls/fast
 
 #=============================================================================
+# Target rules for targets named mymkdir
+
+# Build rule for target.
+mymkdir: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 mymkdir
+.PHONY : mymkdir
+
+# fast build rule for target.
+mymkdir/fast:
+	$(MAKE) -f CMakeFiles/mymkdir.dir/build.make CMakeFiles/mymkdir.dir/build
+.PHONY : mymkdir/fast
+
+#=============================================================================
 # Target rules for targets named myshell
 
 # Build rule for target.
@@ -283,6 +296,33 @@ src/myls.cpp.s:
 	$(MAKE) -f CMakeFiles/myls.dir/build.make CMakeFiles/myls.dir/src/myls.cpp.s
 .PHONY : src/myls.cpp.s
 
+src/mymkdir.o: src/mymkdir.cpp.o
+
+.PHONY : src/mymkdir.o
+
+# target to build an object file
+src/mymkdir.cpp.o:
+	$(MAKE) -f CMakeFiles/mymkdir.dir/build.make CMakeFiles/mymkdir.dir/src/mymkdir.cpp.o
+.PHONY : src/mymkdir.cpp.o
+
+src/mymkdir.i: src/mymkdir.cpp.i
+
+.PHONY : src/mymkdir.i
+
+# target to preprocess a source file
+src/mymkdir.cpp.i:
+	$(MAKE) -f CMakeFiles/mymkdir.dir/build.make CMakeFiles/mymkdir.dir/src/mymkdir.cpp.i
+.PHONY : src/mymkdir.cpp.i
+
+src/mymkdir.s: src/mymkdir.cpp.s
+
+.PHONY : src/mymkdir.s
+
+# target to generate assembly for a file
+src/mymkdir.cpp.s:
+	$(MAKE) -f CMakeFiles/mymkdir.dir/build.make CMakeFiles/mymkdir.dir/src/mymkdir.cpp.s
+.PHONY : src/mymkdir.cpp.s
+
 src/myrm.o: src/myrm.cpp.o
 
 .PHONY : src/myrm.o
@@ -317,6 +357,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... myls"
+	@echo "... mymkdir"
 	@echo "... rebuild_cache"
 	@echo "... myshell"
 	@echo "... myrm"
@@ -335,6 +376,9 @@ help:
 	@echo "... src/myls.o"
 	@echo "... src/myls.i"
 	@echo "... src/myls.s"
+	@echo "... src/mymkdir.o"
+	@echo "... src/mymkdir.i"
+	@echo "... src/mymkdir.s"
 	@echo "... src/myrm.o"
 	@echo "... src/myrm.i"
 	@echo "... src/myrm.s"

@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zabulskyy/UCU/OperatingSystems/myshell/src/mymkdir.cpp
+iostream
+-
+vector
+-
+iostream
+-
+cstdio
+-
+vector
+-
+sys/stat.h
+-
+algorithm
+-
+unistd.h
+-
+boost/filesystem.hpp
+-
+boost/regex.hpp
+-
+boost/filesystem.hpp
+-
+boost/range/adaptors.hpp
+-
+boost/range/iterator_range.hpp
+-
+

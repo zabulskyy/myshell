@@ -56,7 +56,7 @@ char prj_dir[1024];;  // myshell directory
 const char *mod_dir;  // modules directory
 char cur_dir[1024];   // current directory
 vector<string> defauld_modules = {"merrno", "mpwd", "mcd", "mexit"};
-vector<string> my_modules = {"myhello", "mycat"};
+vector<string> my_modules = {"myhello", "mycat", "myls", "mymkdir", "myrm"};
 int merrno = 0;
 
 int main() {
@@ -145,8 +145,9 @@ void parse_command(const string &cmd) {
 
     vector<string> wild_commands = wildcards(command);
 
-    if (wild_commands.size() == 0) {
+     if (wild_commands.size() == 0 || v_opt.size() - wild_commands.size() == 0) {
         merrno = 2;
+        return;
     }
 
     for (auto elem : wild_commands) {
@@ -466,67 +467,67 @@ vector<string> wildcards(string str) {
     vector<string> res;
     struct dirent **namelist;
     size_t found = str.find_last_of("/\\");
-    vector<int> n = {-1, -1};
+    int n = -1;
 
-    vector<string> mask = {str.substr(found + 1), ""};
-    string bla;
-    if (str.size() > 0 && str[0] != '/')
+    string mask = str.substr(found + 1);
+    string bla, dir_open;
+    if (str.size() > 0 && str[0] != '/'){
         bla = '/' + str.substr(0, found + 1);
-    else
-        bla = str.substr(0, found + 1);
-    vector<string> dir_open = {cur_dir + bla, ""};
-
-    n[0] = scandir((dir_open[0]).c_str(), &namelist, nullptr, alphasort);
-    if (found != string::npos) {
-
-        dir_open[1] = str.substr(0, found + 1);
-        mask[1] = str.substr(found + 1);
-        n[1] = scandir((dir_open[1]).c_str(), &namelist, nullptr, alphasort);
-
-
+        dir_open = cur_dir + bla;
     }
+    else{
+        bla = str.substr(0, found + 1);
+        dir_open = bla;
+    }
+
+
+    n = scandir((dir_open).c_str(), &namelist, nullptr, alphasort);
+
     //DIR *dirp = opendir(dir_open);
     if (!check_for_special_symbols(str)) {
         string path_file;
-        for (int i = 0; i < n.size(); ++i) {
-            path_file = dir_open[i] + mask[i];
-            if (exists_test(path_file))
-                res.emplace_back(path_file);
+        path_file = dir_open + mask;
+        if (exists_test(path_file))
+            res.emplace_back(path_file);
+
+        if(res.size() == 0) {
+            merrno = 2;
+            cout<<"There isn't any file found for "<< str<<endl;
         }
         return res;
     }
     char *word_check;
     string y;
 //    cout<<y<<endl;
-    if (n[0] == -1 && n[1] == -1) {
+    if (n == -1 ) {
         merrno = 9;
         return res;
     }
 
 
-    for (int i = 0; i < n.size(); ++i) {
-        while (--n[i] > 1) {
-            word_check = namelist[n[i]]->d_name;
+    while (--n > 1) {
+        word_check = namelist[n]->d_name;
 
 //            cout<<word_check/binendl;
-            if (equal_words(mask[i], 0, word_check, 0)) {
-                y = dir_open[i] + word_check;
-                //            y = word_check;
-                res.emplace_back(y);
+        if (equal_words(mask, 0, word_check, 0)) {
+            y = dir_open + word_check;
+            //            y = word_check;
+            res.emplace_back(y);
 
-            }
+        }
 //            cout<<(int)n[i]<<endl;
-            free(namelist[n[i]]);
+        free(namelist[n]);
 //            cout<<n[i]<<endl;
 
 
-        }
-        free(namelist);
-
     }
+    free(namelist);
 
-    //if(res.size()>0 res[res.size() - 1] == ".")
 
+    if(res.size() == 0) {
+        merrno = 2;
+        cout<<"There isn't any file found for "<< str<<endl;
+    }
     return res;
 }
 
@@ -565,25 +566,6 @@ bool equal_words(string first, int i, string second, int j) {
     if (first[i] == '?' || first[i] == second[j])
         return equal_words(first, i + 1, second, j + 1);
     if (first[i] == '*')
-        return equal_words(first, i, second, j + 1) || equal_words(first, i + 1, second, j);
+        return  equal_words(first, i + 1, second, j) || equal_words(first, i, second, j + 1) ;
     return false;
 }
-
-
-
-/*
-void myls() {
-    DIR *adir;
-    struct dirent *ent;
-    if ((adir = opendir("/home/zabulskyy/CLionProjects/myshell")) != NULL) {
-        //print all the files and directories within directory
-        while ((ent = readdir(adir)) != NULL) {
-            printf("%s\n", ent->d_name);
-        }
-        closedir(adir);
-    } else {
-        // could not open directory
-        perror("");
-    }
-}
-*/

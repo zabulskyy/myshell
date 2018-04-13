@@ -1,1 +1,1 @@
-/usr/bin/c++   -g   CMakeFiles/myrm.dir/src/myrm.cpp.o  -o myrm /usr/lib/libboost_program_options.so /usr/lib/libboost_filesystem.so /usr/lib/libboost_regex.so /usr/lib/libboost_system.so /usr/lib/libboost_filesystem.so /usr/lib/libboost_regex.so /usr/lib/libboost_system.so 
+/usr/bin/c++   -g   CMakeFiles/myrm.dir/src/myrm.cpp.o  -o myrm -rdynamic -lboost_program_options -lboost_filesystem -lboost_regex -lboost_system -lboost_filesystem -lboost_regex -lboost_system 

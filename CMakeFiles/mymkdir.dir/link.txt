@@ -1,0 +1,1 @@
+/usr/bin/c++   -g   CMakeFiles/mymkdir.dir/src/mymkdir.cpp.o  -o mymkdir -rdynamic -lboost_program_options -lboost_filesystem -lboost_regex -lboost_system -lboost_filesystem -lboost_regex -lboost_system 
